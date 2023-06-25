@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, make_response
 from TranscribeAI import TranscendAI
 from flask_cors import CORS
 
@@ -10,7 +10,10 @@ bot = TranscendAI()
 @app.route('/', methods=['POST'])
 def transcribe_summary():
     url = request.json['url']
-    return bot.run_pipeline(url)
+    try:
+        return bot.run_pipeline(url)
+    except Exception:
+        return make_response('Pipeline Error', 400)
 
 
 @app.route('/imagegen', methods=['POST'])

@@ -14,7 +14,7 @@ from diffusers import StableDiffusionImg2ImgPipeline
 from xformers.ops import MemoryEfficientAttentionFlashAttentionOp
 from diffusers import StableDiffusionUpscalePipeline
 import requests
-
+import logging
 
 class TranscendAI:
 
@@ -54,6 +54,7 @@ class TranscendAI:
         self.diffusion2.scheduler = DPMSolverMultistepScheduler.from_config(self.diffusion2.scheduler.config)
         self.diffusion2 = self.diffusion2.to("cuda")
         self.give_n_prompts()
+        logging.log(logging.INFO, "Object Initialized")
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \
