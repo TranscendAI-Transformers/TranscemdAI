@@ -150,21 +150,39 @@ from transformers import pipeline
 # transcribe.model.config.forced_decoder_ids = transcribe.tokenizer.get_decoder_prompt_ids(language="hi", task="transcribe")
 #
 # print('Transcription: ', transcribe(audio)["text"])
-from transformers import AutoImageProcessor, ResNetForImageClassification
-import torch
-from datasets import load_dataset
+# from transformers import AutoImageProcessor, ResNetForImageClassification
+# import torch
+# from datasets import load_dataset
+#
+# dataset = load_dataset("huggingface/cats-image")
+# image = dataset["test"]["image"][0]
+#
+# processor = AutoImageProcessor.from_pretrained("microsoft/resnet-50")
+# model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
+#
+# inputs = processor(image, return_tensors="pt")
+#
+# with torch.no_grad():
+#     logits = model(**inputs).logits
+#
+# # model predicts one of the 1000 ImageNet classes
+# predicted_label = logits.argmax(-1).item()
+# print(model.config.id2label[predicted_label])
 
-dataset = load_dataset("huggingface/cats-image")
-image = dataset["test"]["image"][0]
 
-processor = AutoImageProcessor.from_pretrained("microsoft/resnet-50")
-model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
+from huggingface_hub import snapshot_download
 
-inputs = processor(image, return_tensors="pt")
+from modelscope.pipelines import pipeline
+from modelscope.outputs import OutputKeys
+import pathlib
 
-with torch.no_grad():
-    logits = model(**inputs).logits
+model_dir = pathlib.Path('weights')
+snapshot_download('damo-vilab/modelscope-damo-text-to-video-synthesis',
+                   repo_type='model', local_dir=model_dir)
 
-# model predicts one of the 1000 ImageNet classes
-predicted_label = logits.argmax(-1).item()
-print(model.config.id2label[predicted_label])
+pipe = pipeline('text-to-video-synthesis', model_dir.as_posix())
+test_text = {
+        'text': 'A panda eating bamboo on a rock.',
+    }
+output_video_path = pipe(test_text,)[OutputKeys.OUTPUT_VIDEO]
+print('output_video_path:', output_video_path)

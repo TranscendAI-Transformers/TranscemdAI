@@ -175,8 +175,8 @@ class TranscendAI:
 
     def generate_video(self, text):
         prompt = text
-        video_frames = self.video_diffuser(prompt, negative_prompt="bad, deformed, ugly, bad anatomy"
-                                           , num_inference_steps=250, num_frames=32).frames
+        video_frames = self.video_diffuser(prompt, num_inference_steps=50, num_frames=80,
+                                           negative_prompt=self.negative_prompt, height=256, width=256).frames
         video_path = export_to_video(video_frames)
         print(video_path)
         torch.cuda.empty_cache()
