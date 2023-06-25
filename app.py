@@ -12,7 +12,8 @@ def transcribe_summary():
     url = request.json['url']
     try:
         return bot.run_pipeline(url)
-    except Exception:
+    except Exception as ex:
+        print(ex)
         return make_response('Pipeline Error', 400)
 
 
@@ -28,16 +29,21 @@ def img_2_img():
         text = request.json['text']
         url = request.json['url']
         return bot.img_2_img(text, url)
-    except Exception:
-        return make_response('Pipeline Error', 400)
+    except Exception as ex:
+        print(ex)
+        return make_response('Image Url Error', 400)
 
 
 @app.route('/aiupscaler', methods=['POST'])
 def upscale_image():
-    # text = request.json['text']
-    url = request.json['url']
-    print(url)
-    return bot.upscale_image(None, url)
+    try:
+        # text = request.json['text']
+        url = request.json['url']
+        print(url)
+        return bot.upscale_image(None, url)
+    except Exception as ex:
+        print(ex)
+        return make_response('Image Url Error', 400)
 
 
 @app.route('/videogen', methods=['POST'])
