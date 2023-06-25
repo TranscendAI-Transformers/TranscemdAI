@@ -16,6 +16,10 @@ from diffusers import StableDiffusionUpscalePipeline
 import requests
 from transformers import AutoImageProcessor, ResNetForImageClassification
 from transformers import YolosImageProcessor, YolosForObjectDetection
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
+import cv2
 
 
 class TranscendAI:
@@ -250,14 +254,24 @@ class TranscendAI:
 
         target_sizes = torch.tensor([image.size[::-1]])
         results = self.yolo_image_processor.post_process_object_detection(outputs, threshold=0.9, target_sizes=target_sizes)[0]
-        output=[]
+        output = []
+        image.save('original.png')
+        img = cv2.imread("original.png")
         for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
             box = [round(i, 2) for i in box.tolist()]
             out=f"Detected {self.yolo_model.config.id2label[label.item()]} with confidence " \
                 f"{round(score.item(), 3)} at location {box}"
             output.append(out)
-            print(out)
-        return output
+            print(box)
+            cv2.rectangle(img, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
+                          (0, 0, 255), 3)
+        cv2.imwrite('modified_image.jpg',img)
+        with open('modified_image.jpg', "rb") as img_file:
+            img_str = base64.b64encode(img_file.read())
+            resp = 'data:image/png;base64,' + img_str.decode('utf-8')
+        os.remove("original.png")
+        os.remove("modified_image.jpg")
+        return {'text': output,'image':resp}
 
     # this is the pipeline sequence
     def run_pipeline(self, url):
