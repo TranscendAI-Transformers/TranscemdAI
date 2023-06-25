@@ -164,7 +164,7 @@ class TranscendAI:
         prompt = "a bird sitting on a branch"
         upscaled_image = self.upscaler(prompt=prompt, image=low_res_img).images[0]
         temp_name = "upsampled_cat.png"
-        upscaled_image.save()
+        upscaled_image.save(temp_name)
         with open(temp_name, "rb") as img_file:
             my_string = base64.b64encode(img_file.read())
             resp = 'data:image/png;base64,' + my_string.decode('utf-8')
@@ -182,8 +182,6 @@ class TranscendAI:
         return video_path
 
     def ask_qa_bot(self, question, context):
-        if len(self.res.keys()) == 0:
-            self.check_cache()
         qa_input = {
             'question': question,
             'context': context

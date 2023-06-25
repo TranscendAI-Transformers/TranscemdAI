@@ -143,10 +143,28 @@ import torch
 from transformers import pipeline
 
 # path to the audio file to be transcribed
-audio = "/path/to/audio.format"
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
+# audio = "./temp/test.wav"
+# device = "cuda:0" if torch.cuda.is_available() else "cpu"
+#
+# transcribe = pipeline(task="automatic-speech-recognition", model="vasista22/whisper-hindi-large-v2", chunk_length_s=30, device=device)
+# transcribe.model.config.forced_decoder_ids = transcribe.tokenizer.get_decoder_prompt_ids(language="hi", task="transcribe")
+#
+# print('Transcription: ', transcribe(audio)["text"])
+from transformers import AutoImageProcessor, ResNetForImageClassification
+import torch
+from datasets import load_dataset
 
-transcribe = pipeline(task="automatic-speech-recognition", model="vasista22/whisper-hindi-large-v2", chunk_length_s=30, device=device)
-transcribe.model.config.forced_decoder_ids = transcribe.tokenizer.get_decoder_prompt_ids(language="hi", task="transcribe")
+dataset = load_dataset("huggingface/cats-image")
+image = dataset["test"]["image"][0]
 
-print('Transcription: ', transcribe(audio)["text"])
+processor = AutoImageProcessor.from_pretrained("microsoft/resnet-50")
+model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
+
+inputs = processor(image, return_tensors="pt")
+
+with torch.no_grad():
+    logits = model(**inputs).logits
+
+# model predicts one of the 1000 ImageNet classes
+predicted_label = logits.argmax(-1).item()
+print(model.config.id2label[predicted_label])
