@@ -24,9 +24,12 @@ def generate_image():
 
 @app.route('/img2img', methods=['POST'])
 def img_2_img():
-    text = request.json['text']
-    url = request.json['url']
-    return bot.img_2_img(text, url)
+    try:
+        text = request.json['text']
+        url = request.json['url']
+        return bot.img_2_img(text, url)
+    except Exception:
+        return make_response('Pipeline Error', 400)
 
 
 @app.route('/aiupscaler', methods=['POST'])
