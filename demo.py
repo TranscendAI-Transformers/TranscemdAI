@@ -185,4 +185,7 @@ test_text = {
         'text': 'A panda eating bamboo on a rock.',
     }
 output_video_path = pipe(test_text,)[OutputKeys.OUTPUT_VIDEO]
-print('output_video_path:', output_video_path)
+
+with open('test.mp4', "wb") as out_file:  # open for [w]riting as [b]inary
+    out_file.write(output_video_path)
+print('output_video_path:', )

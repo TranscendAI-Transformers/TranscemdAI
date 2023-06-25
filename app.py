@@ -63,6 +63,7 @@ def hello():
 def classify():
     try:
         url = request.json['url']
+        print(url)
         return bot.classify(url)
     except Exception as ex:
         print(ex)
