@@ -14,7 +14,8 @@ from diffusers import StableDiffusionImg2ImgPipeline
 from xformers.ops import MemoryEfficientAttentionFlashAttentionOp
 from diffusers import StableDiffusionUpscalePipeline
 import requests
-import logging
+from transformers import AutoImageProcessor, ResNetForImageClassification
+
 
 class TranscendAI:
 
@@ -54,7 +55,8 @@ class TranscendAI:
         self.diffusion2.scheduler = DPMSolverMultistepScheduler.from_config(self.diffusion2.scheduler.config)
         self.diffusion2 = self.diffusion2.to("cuda")
         self.give_n_prompts()
-        logging.log(logging.INFO, "Object Initialized")
+        self.image_processor = AutoImageProcessor.from_pretrained("microsoft/resnet-50")
+        self.resnet_model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \
@@ -219,6 +221,19 @@ class TranscendAI:
                 return self.res
         else:
             return None
+
+    def classify(self, url):
+        response = requests.get(url)
+        image = Image.open(BytesIO(response.content)).convert("RGB")
+        image = image.resize((512, 512))
+        inputs = self.image_processor(image, return_tensors="pt")
+
+        with torch.no_grad():
+            logits = self.resnet_model(**inputs).logits
+
+        # model predicts one of the 1000 ImageNet classes
+        predicted_label = logits.argmax(-1).item()
+        return self.resnet_model.config.id2label[predicted_label]
 
     # this is the pipeline sequence
     def run_pipeline(self, url):

@@ -56,4 +56,14 @@ def generate_video():
 def hello():
     question = request.json['question']
     context = request.json['context']
-    return bot.ask_qa_bot(question,context)
+    return bot.ask_qa_bot(question, context)
+
+
+@app.route("/classify", methods=['POST'])
+def classify():
+    try:
+        url = request.json['url']
+        return bot.classify(url)
+    except Exception as ex:
+        print(ex)
+        return make_response('Image Url Error', 400)
