@@ -68,3 +68,14 @@ def classify():
     except Exception as ex:
         print(ex)
         return make_response('Image Url Error', 400)
+
+
+@app.route("/yolo", methods=['POST'])
+def yolo():
+    try:
+        url = request.json['url']
+        print(url)
+        return bot.yolo(url)
+    except Exception as ex:
+        print(ex)
+        return make_response('Image Url Error', 400)

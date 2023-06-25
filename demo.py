@@ -170,22 +170,50 @@ from transformers import pipeline
 # print(model.config.id2label[predicted_label])
 
 
-from huggingface_hub import snapshot_download
+# from huggingface_hub import snapshot_download
+#
+# from modelscope.pipelines import pipeline
+# from modelscope.outputs import OutputKeys
+# import pathlib
+#
+# model_dir = pathlib.Path('weights')
+# snapshot_download('damo-vilab/modelscope-damo-text-to-video-synthesis',
+#                    repo_type='model', local_dir=model_dir)
+#
+# pipe = pipeline('text-to-video-synthesis', model_dir.as_posix())
+# test_text = {
+#         'text': 'spiderman running',
+#     }
+# output_video_path = pipe(test_text,)[OutputKeys.OUTPUT_VIDEO]
+#
+# with open('test.mp4', "wb") as out_file:  # open for [w]riting as [b]inary
+#     out_file.write(output_video_path)
+# print('output_video_path:', )
+from transformers import YolosImageProcessor, YolosForObjectDetection
+from PIL import Image
+import torch
+import requests
 
-from modelscope.pipelines import pipeline
-from modelscope.outputs import OutputKeys
-import pathlib
+url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+image = Image.open(requests.get(url, stream=True).raw)
 
-model_dir = pathlib.Path('weights')
-snapshot_download('damo-vilab/modelscope-damo-text-to-video-synthesis',
-                   repo_type='model', local_dir=model_dir)
+model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
+image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
 
-pipe = pipeline('text-to-video-synthesis', model_dir.as_posix())
-test_text = {
-        'text': 'A panda eating bamboo on a rock.',
-    }
-output_video_path = pipe(test_text,)[OutputKeys.OUTPUT_VIDEO]
+inputs = image_processor(images=image, return_tensors="pt")
+outputs = model(**inputs)
 
-with open('test.mp4', "wb") as out_file:  # open for [w]riting as [b]inary
-    out_file.write(output_video_path)
-print('output_video_path:', )
+# model predicts bounding boxes and corresponding COCO classes
+logits = outputs.logits
+bboxes = outputs.pred_boxes
+
+
+# print results
+target_sizes = torch.tensor([image.size[::-1]])
+results = image_processor.post_process_object_detection(outputs, threshold=0.9, target_sizes=target_sizes)[0]
+for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
+    box = [round(i, 2) for i in box.tolist()]
+    print(
+        f"Detected {model.config.id2label[label.item()]} with confidence "
+        f"{round(score.item(), 3)} at location {box}"
+    )

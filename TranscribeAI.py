@@ -15,6 +15,7 @@ from xformers.ops import MemoryEfficientAttentionFlashAttentionOp
 from diffusers import StableDiffusionUpscalePipeline
 import requests
 from transformers import AutoImageProcessor, ResNetForImageClassification
+from transformers import YolosImageProcessor, YolosForObjectDetection
 
 
 class TranscendAI:
@@ -57,6 +58,8 @@ class TranscendAI:
         self.give_n_prompts()
         self.image_processor = AutoImageProcessor.from_pretrained("microsoft/resnet-50")
         self.resnet_model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
+        self.yolo_model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
+        self.yolo_image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \
@@ -234,6 +237,27 @@ class TranscendAI:
         # model predicts one of the 1000 ImageNet classes
         predicted_label = logits.argmax(-1).item()
         return self.resnet_model.config.id2label[predicted_label]
+
+    def yolo(self, url):
+        image = Image.open(requests.get(url, stream=True).raw)
+
+        inputs = self.yolo_image_processor(images=image, return_tensors="pt")
+        outputs = self.yolo_model(**inputs)
+
+        # model predicts bounding boxes and corresponding COCO classes
+        logits = outputs.logits
+        bboxes = outputs.pred_boxes
+
+        target_sizes = torch.tensor([image.size[::-1]])
+        results = self.yolo_image_processor.post_process_object_detection(outputs, threshold=0.9, target_sizes=target_sizes)[0]
+        output=[]
+        for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
+            box = [round(i, 2) for i in box.tolist()]
+            out=f"Detected {self.yolo_model.config.id2label[label.item()]} with confidence " \
+                f"{round(score.item(), 3)} at location {box}"
+            output.append(out)
+            print(out)
+        return output
 
     # this is the pipeline sequence
     def run_pipeline(self, url):
