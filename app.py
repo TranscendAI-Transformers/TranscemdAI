@@ -1,10 +1,10 @@
 from flask import Flask, request
-from TranscribeAI import TranscribeAI
+from TranscribeAI import TranscendAI
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, resources={r"*": {"origins": "*"}})
-bot = TranscribeAI()
+bot = TranscendAI()
 
 
 @app.route('/', methods=['POST'])

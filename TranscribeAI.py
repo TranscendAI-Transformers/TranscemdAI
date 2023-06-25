@@ -16,7 +16,7 @@ from diffusers import StableDiffusionUpscalePipeline
 import requests
 
 
-class TranscribeAI:
+class TranscendAI:
 
     def __init__(self):
         self.negative_prompt = None
@@ -163,11 +163,12 @@ class TranscribeAI:
         low_res_img = low_res_img.resize((512, 512))
         prompt = "a bird sitting on a branch"
         upscaled_image = self.upscaler(prompt=prompt, image=low_res_img).images[0]
-        upscaled_image.save("upsampled_cat.png")
-        with open("upsampled_cat.png", "rb") as img_file:
+        temp_name = "upsampled_cat.png"
+        upscaled_image.save()
+        with open(temp_name, "rb") as img_file:
             my_string = base64.b64encode(img_file.read())
             resp = 'data:image/png;base64,' + my_string.decode('utf-8')
-        os.remove("upsampled_cat.png")
+        os.remove(temp_name)
         torch.cuda.empty_cache()
         return resp
 
