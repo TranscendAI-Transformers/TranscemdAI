@@ -11,6 +11,7 @@ from transformers import AutoImageProcessor, ResNetForImageClassification
 from transformers import YolosImageProcessor, YolosForObjectDetection
 import cv2
 from diffusers.utils import export_to_video
+import random
 
 
 class ImageBot:
@@ -117,6 +118,7 @@ class ImageBot:
         results = self.yolo_image_processor.post_process_object_detection(outputs, threshold=0.9,
                                                                           target_sizes=target_sizes)[0]
         output = []
+        colors=[]
         image.save('original.png')
         img = cv2.imread("original.png")
         for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
@@ -125,15 +127,17 @@ class ImageBot:
                   f"{round(score.item(), 3)} at location {box}"
             output.append(out)
             print(box)
+            color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
             cv2.rectangle(img, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
-                          (0, 0, 255), 3)
+                          color, 3)
+            colors.append('rgb'+color[::-1].__repr__())
         cv2.imwrite('modified_image.jpg', img)
         with open('modified_image.jpg', "rb") as img_file:
             img_str = base64.b64encode(img_file.read())
             resp = 'data:image/png;base64,' + img_str.decode('utf-8')
         os.remove("original.png")
         os.remove("modified_image.jpg")
-        return {'text': output, 'image': resp}
+        return {'text': output, 'image': resp,'colors':colors}
 
     def generate_video(self, text):
         prompt = text
