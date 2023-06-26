@@ -85,8 +85,9 @@ def yolo():
 @app.route('/text_generation', methods=['POST'])
 def text_generation():
     try:
-        text= request.json['text']
-        return bot.text_generation(text)
+        text = request.json['text']
+        multiple = request.json['multiple']
+        return bot.text_generation(text, multiple)
     except Exception as ex:
         print(ex)
         return make_response('Text Generation Error',400)

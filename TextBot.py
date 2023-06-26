@@ -22,6 +22,7 @@ class TextBot:
         self.audio_format = '.wav'
         self.output_format = '.json'
         self.temp_location = './temp/'
+        torch.cuda.empty_cache()
 
     def process_url(self, url):
         self.url = url
@@ -99,9 +100,14 @@ class TextBot:
         torch.cuda.empty_cache()
         return ans
 
-    def text_generation(self, text):
-        return self.text_generator(text, max_length=150, num_return_sequences=1, top_k=0,
-                                   temperature=0.8, do_sample=True, )[0]
+    def text_generation(self, text, multiple):
+        num = 1
+        if multiple:
+            num = 3
+        resp = self.text_generator(text, max_length=150, num_return_sequences=num, top_k=0,
+                                   temperature=0.8, do_sample=True, )
+        torch.cuda.empty_cache()
+        return resp
 
     def run_pipeline(self, url, t_only):
         self.process_url(url)
@@ -112,4 +118,5 @@ class TextBot:
         if not t_only:
             self.generate_summary()
         self.store_output()
+        torch.cuda.empty_cache()
         return self.res

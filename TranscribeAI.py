@@ -53,6 +53,6 @@ class TranscendAI:
     def ask_qa_bot(self, question, context):
         return self.text_bot.ask_qa_bot(question, context)
 
-    def text_generation(self, text):
-        return self.text_bot.text_generation(text)
+    def text_generation(self, text, multiple):
+        return self.text_bot.text_generation(text, multiple)
 
