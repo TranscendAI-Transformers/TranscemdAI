@@ -14,6 +14,7 @@ class TextBot:
                                          framework="pt")
         self.nlp = pipeline('question-answering', model="deepset/roberta-large-squad2",
                             tokenizer="deepset/roberta-large-squad2", device=0, framework="pt")
+        self.text_generator = pipeline('text-generation', model='gpt2-large', device=0)
         self.url = None
         self.title = None
         self.res = {}
@@ -88,6 +89,19 @@ class TextBot:
     def store_output(self):
         with open(self.temp_location + self.title + self.output_format, "w") as outfile:
             json.dump(self.res, outfile)
+
+    def ask_qa_bot(self, question, context):
+        qa_input = {
+            'question': question,
+            'context': context
+        }
+        ans = self.nlp(qa_input)
+        torch.cuda.empty_cache()
+        return ans
+
+    def text_generation(self, text):
+        return self.text_generator(text, max_length=150, num_return_sequences=1, top_k=0,
+                                   temperature=0.8, do_sample=True, )[0]
 
     def run_pipeline(self, url):
         self.process_url(url)

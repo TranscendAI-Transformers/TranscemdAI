@@ -10,6 +10,7 @@ from xformers.ops import MemoryEfficientAttentionFlashAttentionOp
 from transformers import AutoImageProcessor, ResNetForImageClassification
 from transformers import YolosImageProcessor, YolosForObjectDetection
 import cv2
+from diffusers.utils import export_to_video
 
 
 class ImageBot:
@@ -35,6 +36,11 @@ class ImageBot:
         self.resnet_model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
         self.yolo_model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
         self.yolo_image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
+        self.video_diffuser = DiffusionPipeline.from_pretrained("damo-vilab/text-to-video-ms-1.7b",
+                                                                torch_dtype=torch.float16,
+                                                                variant="fp16")
+        self.video_diffuser.scheduler = DPMSolverMultistepScheduler.from_config(self.video_diffuser.scheduler.config)
+        self.video_diffuser.enable_model_cpu_offload()
         self.temp_location = './temp/'
         self.negative_prompt = None
         self.give_n_prompts()
@@ -127,6 +133,15 @@ class ImageBot:
         os.remove("original.png")
         os.remove("modified_image.jpg")
         return {'text': output, 'image': resp}
+
+    def generate_video(self, text):
+        prompt = text
+        video_frames = self.video_diffuser(prompt, num_inference_steps=50, num_frames=32,
+                                           negative_prompt=self.negative_prompt).frames
+        video_path = export_to_video(video_frames)
+        print(video_path)
+        torch.cuda.empty_cache()
+        return video_path
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \
