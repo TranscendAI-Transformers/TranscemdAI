@@ -29,8 +29,8 @@ class TranscendAI:
         self.image_bot = ImageBot()
         self.text_bot = TextBot()
 
-    def run_pipeline(self, url):
-        return self.text_bot.run_pipeline(url)
+    def run_pipeline(self, url, t_only):
+        return self.text_bot.run_pipeline(url, t_only)
 
     def generate_image(self, text):
         return self.image_bot.generate_image(text)

@@ -103,12 +103,13 @@ class TextBot:
         return self.text_generator(text, max_length=150, num_return_sequences=1, top_k=0,
                                    temperature=0.8, do_sample=True, )[0]
 
-    def run_pipeline(self, url):
+    def run_pipeline(self, url, t_only):
         self.process_url(url)
         cache_hit = self.check_cache()
         if cache_hit is not None:
             return cache_hit
         self.transcribe_audio()
-        self.generate_summary()
+        if not t_only:
+            self.generate_summary()
         self.store_output()
         return self.res

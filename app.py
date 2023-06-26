@@ -10,8 +10,9 @@ bot = TranscendAI()
 @app.route('/', methods=['POST'])
 def transcribe_summary():
     url = request.json['url']
+    t_only = request.json['tOnly']
     try:
-        return bot.run_pipeline(url)
+        return bot.run_pipeline(url, t_only)
     except Exception as ex:
         print(ex)
         return make_response('Pipeline Error', 400)
