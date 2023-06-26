@@ -63,7 +63,6 @@ class TranscendAI:
         self.yolo_model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
         self.yolo_image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
         self.text_generator = pipeline('text-generation', model='gpt2-large', device=0)
-        set_seed(42)
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \
@@ -140,7 +139,7 @@ class TranscendAI:
     def generate_image(self, text):
         prompt = text
         image = self.diffusion2(prompt, negative_prompt=self.negative_prompt, num_inference_steps=100,
-                                height=768, width= 768).images[0]
+                                height=768, width=768).images[0]
         image_name = self.temp_location + text + ".png"
         image.save(image_name)
         with open(image_name, "rb") as img_file:
@@ -253,19 +252,20 @@ class TranscendAI:
         bboxes = outputs.pred_boxes
 
         target_sizes = torch.tensor([image.size[::-1]])
-        results = self.yolo_image_processor.post_process_object_detection(outputs, threshold=0.9, target_sizes=target_sizes)[0]
+        results = \
+        self.yolo_image_processor.post_process_object_detection(outputs, threshold=0.9, target_sizes=target_sizes)[0]
         output = []
         image.save('original.png')
         img = cv2.imread("original.png")
         for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
             box = [round(i, 2) for i in box.tolist()]
-            out= f"Detected {self.yolo_model.config.id2label[label.item()]} with confidence " \
-                f"{round(score.item(), 3)} at location {box}"
+            out = f"Detected {self.yolo_model.config.id2label[label.item()]} with confidence " \
+                  f"{round(score.item(), 3)} at location {box}"
             output.append(out)
             print(box)
             cv2.rectangle(img, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])),
                           (0, 0, 255), 3)
-        cv2.imwrite('modified_image.jpg',img)
+        cv2.imwrite('modified_image.jpg', img)
         with open('modified_image.jpg', "rb") as img_file:
             img_str = base64.b64encode(img_file.read())
             resp = 'data:image/png;base64,' + img_str.decode('utf-8')
@@ -274,7 +274,8 @@ class TranscendAI:
         return {'text': output, 'image': resp}
 
     def text_generation(self, text):
-        return self.text_generator(text, max_length=150, num_return_sequences=1)[0]
+        return self.text_generator(text, max_length=150, num_return_sequences=1, top_k=0,
+                                   temperature=0.8, do_sample=True, )[0]
 
     # this is the pipeline sequence
     def run_pipeline(self, url):
