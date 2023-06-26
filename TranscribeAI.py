@@ -16,10 +16,8 @@ from diffusers import StableDiffusionUpscalePipeline
 import requests
 from transformers import AutoImageProcessor, ResNetForImageClassification
 from transformers import YolosImageProcessor, YolosForObjectDetection
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import numpy as np
 import cv2
+from transformers import pipeline, set_seed
 
 
 class TranscendAI:
@@ -64,6 +62,8 @@ class TranscendAI:
         self.resnet_model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
         self.yolo_model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
         self.yolo_image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
+        self.text_generator = pipeline('text-generation', model='gpt2-large')
+        set_seed(42)
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \
@@ -259,7 +259,7 @@ class TranscendAI:
         img = cv2.imread("original.png")
         for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
             box = [round(i, 2) for i in box.tolist()]
-            out=f"Detected {self.yolo_model.config.id2label[label.item()]} with confidence " \
+            out= f"Detected {self.yolo_model.config.id2label[label.item()]} with confidence " \
                 f"{round(score.item(), 3)} at location {box}"
             output.append(out)
             print(box)
@@ -271,7 +271,10 @@ class TranscendAI:
             resp = 'data:image/png;base64,' + img_str.decode('utf-8')
         os.remove("original.png")
         os.remove("modified_image.jpg")
-        return {'text': output,'image':resp}
+        return {'text': output, 'image': resp}
+
+    def text_generation(self, text):
+        return self.text_generator(text, max_length=150, num_return_sequences=1)
 
     # this is the pipeline sequence
     def run_pipeline(self, url):

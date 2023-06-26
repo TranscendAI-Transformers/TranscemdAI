@@ -79,3 +79,13 @@ def yolo():
     except Exception as ex:
         print(ex)
         return make_response('Image Url Error', 400)
+
+
+@app.route('/text_generation', methods=['POST'])
+def text_generation():
+    try:
+        text= request.json['text']
+        return bot.text_generation(text)
+    except Exception as ex:
+        print(ex)
+        return make_response('Text Generation Error',400)
