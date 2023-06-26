@@ -252,8 +252,8 @@ class TranscendAI:
         bboxes = outputs.pred_boxes
 
         target_sizes = torch.tensor([image.size[::-1]])
-        results = \
-        self.yolo_image_processor.post_process_object_detection(outputs, threshold=0.9, target_sizes=target_sizes)[0]
+        results = self.yolo_image_processor.post_process_object_detection(outputs, threshold=0.9,
+                                                                          target_sizes=target_sizes)[0]
         output = []
         image.save('original.png')
         img = cv2.imread("original.png")

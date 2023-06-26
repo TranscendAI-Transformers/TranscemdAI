@@ -218,8 +218,14 @@ from transformers import pipeline
 #         f"{round(score.item(), 3)} at location {box}"
 #     )
 
-from transformers import pipeline, set_seed
-generator = pipeline('text-generation', model='gpt2-large')
-set_seed(42)
-print(generator("what is java?", max_length=150, num_return_sequences=1))
+# from transformers import pipeline, set_seed
+# generator = pipeline('text-generation', model='gpt2-large')
+# set_seed(42)
+# print(generator("what is java?", max_length=150, num_return_sequences=1))
+from ImageBot import ImageBot
+bot = ImageBot()
+# bot.generate_image('kid playing in park')
+# bot.img_2_img('kid running', 'https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
+# bot.upscale_image(None,'https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
+bot.yolo('https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
 
