@@ -49,6 +49,7 @@ class ImageBot:
         prompt = text
         image = self.diffusion2(prompt, negative_prompt=self.negative_prompt, num_inference_steps=100,
                                 height=768, width=768).images[0]
+        text = "dummy"
         image_name = self.temp_location + text + ".png"
         image.save(image_name)
         with open(image_name, "rb") as img_file:
