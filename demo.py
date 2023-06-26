@@ -222,10 +222,13 @@ from transformers import pipeline
 # generator = pipeline('text-generation', model='gpt2-large')
 # set_seed(42)
 # print(generator("what is java?", max_length=150, num_return_sequences=1))
-from ImageBot import ImageBot
-bot = ImageBot()
-# bot.generate_image('kid playing in park')
-# bot.img_2_img('kid running', 'https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
-# bot.upscale_image(None,'https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
-bot.yolo('https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
+# from ImageBot import ImageBot
+# bot = ImageBot()
+# # bot.generate_image('kid playing in park')
+# # bot.img_2_img('kid running', 'https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
+# # bot.upscale_image(None,'https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
+# bot.yolo('https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
+from TextBot import  TextBot
+bot= TextBot()
+bot.run_pipeline('https://www.youtube.com/watch?v=HSh6EgMwMOY&ab_channel=CNBC')
 
