@@ -62,7 +62,7 @@ class TranscendAI:
         self.resnet_model = ResNetForImageClassification.from_pretrained("microsoft/resnet-50")
         self.yolo_model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
         self.yolo_image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
-        self.text_generator = pipeline('text-generation', model='gpt2-large')
+        self.text_generator = pipeline('text-generation', model='gpt2-large', device=0)
         set_seed(42)
 
     def give_n_prompts(self):
@@ -274,7 +274,7 @@ class TranscendAI:
         return {'text': output, 'image': resp}
 
     def text_generation(self, text):
-        return self.text_generator(text, max_length=150, num_return_sequences=1)
+        return self.text_generator(text, max_length=150, num_return_sequences=1)[0]
 
     # this is the pipeline sequence
     def run_pipeline(self, url):
