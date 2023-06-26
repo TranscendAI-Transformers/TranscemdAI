@@ -38,10 +38,9 @@ def img_2_img():
 @app.route('/aiupscaler', methods=['POST'])
 def upscale_image():
     try:
-        # text = request.json['text']
         url = request.json['url']
         print(url)
-        return bot.upscale_image(None, url)
+        return bot.upscale_image( url)
     except Exception as ex:
         print(ex)
         return make_response('Image Url Error', 400)

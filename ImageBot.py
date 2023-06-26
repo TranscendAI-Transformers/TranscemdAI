@@ -75,7 +75,7 @@ class ImageBot:
         torch.cuda.empty_cache()
         return resp
 
-    def upscale_image(self, prompt, url):
+    def upscale_image(self, url):
         # url = "https://cdn.britannica.com/30/94430-050-D0FC51CD/Niagara-Falls.jpg"
         response = requests.get(url)
         low_res_img = Image.open(BytesIO(response.content)).convert("RGB")

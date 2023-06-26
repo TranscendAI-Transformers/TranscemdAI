@@ -38,8 +38,8 @@ class TranscendAI:
     def img_2_img(self, text, url):
         return self.image_bot.img_2_img(text, url)
 
-    def upscale_image(self, text, url):
-        return self.image_bot.upscale_image(text, url)
+    def upscale_image(self, url):
+        return self.image_bot.upscale_image( url)
 
     def generate_video(self, text):
         return self.image_bot.generate_video(text)
