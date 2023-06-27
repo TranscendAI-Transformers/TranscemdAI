@@ -143,7 +143,7 @@ class ImageBot:
         video_frames = self.video_diffuser(prompt, num_inference_steps=50, num_frames=32,
                                            negative_prompt=self.negative_prompt).frames
         # video_path = export_to_video(video_frames)
-        vid_path='E:/TranscendAI/vid'+str(random.randint(0,500))+'.avi'
+        vid_path='E:/TranscendAI/vid/'+str(random.randint(0,500))+'.avi'
         out = cv2.VideoWriter(vid_path, cv2.VideoWriter_fourcc(*'DIVX'), 15, (256,256))
         for i in range(len(video_frames)):
             out.write(video_frames[i])
