@@ -76,7 +76,6 @@ class ImageBot:
         return resp
 
     def upscale_image(self, url):
-        # url = "https://cdn.britannica.com/30/94430-050-D0FC51CD/Niagara-Falls.jpg"
         response = requests.get(url)
         low_res_img = Image.open(BytesIO(response.content)).convert("RGB")
         low_res_img = low_res_img.resize((512, 512))
@@ -143,10 +142,15 @@ class ImageBot:
         prompt = text
         video_frames = self.video_diffuser(prompt, num_inference_steps=50, num_frames=32,
                                            negative_prompt=self.negative_prompt).frames
-        video_path = export_to_video(video_frames)
-        print(video_path)
+        # video_path = export_to_video(video_frames)
+        vid_path='E:/TranscendAI/vid'+str(random.randint(0,500))+'.avi'
+        out = cv2.VideoWriter(vid_path, cv2.VideoWriter_fourcc(*'DIVX'), 15, (256,256))
+        for i in range(len(video_frames)):
+            out.write(video_frames[i])
+        out.release()
+        print(vid_path)
         torch.cuda.empty_cache()
-        return video_path
+        return vid_path
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \
