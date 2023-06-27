@@ -40,7 +40,7 @@ def upscale_image():
     try:
         url = request.json['url']
         print(url)
-        return bot.upscale_image( url)
+        return bot.upscale_image(url)
     except Exception as ex:
         print(ex)
         return make_response('Image Url Error', 400)
@@ -89,4 +89,12 @@ def text_generation():
         return bot.text_generation(text, multiple)
     except Exception as ex:
         print(ex)
-        return make_response('Text Generation Error',400)
+        return make_response('Text Generation Error', 400)
+
+
+@app.route('/summary', methods=['POST'])
+def summary():
+    try:
+        return bot.summary(request.json['text'])
+    except Exception as e:
+        return make_response('Pipeline Error', 400)

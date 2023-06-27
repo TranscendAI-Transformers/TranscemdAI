@@ -87,6 +87,23 @@ class TextBot:
         print('summarization done')
         torch.cuda.empty_cache()
 
+    def summary(self,text):
+        prev = 0
+
+        summary = []
+        if len(text) > 3000:
+            batches = math.ceil(len(text) / 3000)
+            for i in range(1, batches + 1):
+                t_sum = self.summarizer_model(text[prev:i * 3000], max_length=150, min_length=30, do_sample=False)
+                summary.append(t_sum[0]['summary_text'].lower())
+                prev += 3000
+        else:
+            t_sum = self.summarizer_model(text, max_length=150, min_length=30, do_sample=False)
+            summary.append(t_sum[0]['summary_text'].lower())
+        print('summarization done')
+        torch.cuda.empty_cache()
+        return summary
+
     def store_output(self):
         with open(self.temp_location + self.title + self.output_format, "w") as outfile:
             json.dump(self.res, outfile)

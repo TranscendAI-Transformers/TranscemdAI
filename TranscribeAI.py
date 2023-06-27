@@ -56,3 +56,6 @@ class TranscendAI:
     def text_generation(self, text, multiple):
         return self.text_bot.text_generation(text, multiple)
 
+    def summary(self, text):
+        return self.text_bot.summary(text)
+
