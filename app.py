@@ -98,3 +98,12 @@ def summary():
         return bot.summary(request.json['text'])
     except Exception as e:
         return make_response('Pipeline Error', 400)
+
+
+@app.route('/image_caption', methods=['POST'])
+def image_caption():
+    try:
+        url = request.json['url']
+        return bot.image_caption(url)
+    except Exception as e:
+        return make_response('Image Url Error', 400)

@@ -12,6 +12,9 @@ from transformers import YolosImageProcessor, YolosForObjectDetection
 import cv2
 from diffusers.utils import export_to_video
 import random
+from transformers import pipeline
+
+
 
 
 class ImageBot:
@@ -42,6 +45,7 @@ class ImageBot:
                                                                 variant="fp16")
         self.video_diffuser.scheduler = DPMSolverMultistepScheduler.from_config(self.video_diffuser.scheduler.config)
         self.video_diffuser.enable_model_cpu_offload()
+        self.image_to_text = pipeline("image-to-text", model="nlpconnect/vit-gpt2-image-captioning")
         self.temp_location = './temp/'
         self.negative_prompt = None
         self.give_n_prompts()
@@ -151,6 +155,9 @@ class ImageBot:
         print(vid_path)
         torch.cuda.empty_cache()
         return vid_path
+
+    def image_caption(self, url):
+        return self.image_to_text(url)
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \

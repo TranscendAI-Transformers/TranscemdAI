@@ -59,3 +59,6 @@ class TranscendAI:
     def summary(self, text):
         return self.text_bot.summary(text)
 
+    def image_caption(self, url):
+        return self.image_bot.image_caption(url)
+

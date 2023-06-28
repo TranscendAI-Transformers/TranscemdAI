@@ -228,7 +228,13 @@ from transformers import pipeline
 # # bot.img_2_img('kid running', 'https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
 # # bot.upscale_image(None,'https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
 # bot.yolo('https://cdn.outsideonline.com/wp-content/uploads/2017/12/13/kids-running-raising-rippers_h.jpg')
-from TextBot import  TextBot
-bot= TextBot()
-bot.run_pipeline('https://www.youtube.com/watch?v=HSh6EgMwMOY&ab_channel=CNBC')
+# from TextBot import  TextBot
+# bot= TextBot()
+# bot.run_pipeline('https://www.youtube.com/watch?v=HSh6EgMwMOY&ab_channel=CNBC')
+
+from transformers import pipeline
+
+image_to_text = pipeline("image-to-text", model="nlpconnect/vit-gpt2-image-captioning")
+
+print(image_to_text("https://ankur3107.github.io/assets/images/image-captioning-example.png"))
 
