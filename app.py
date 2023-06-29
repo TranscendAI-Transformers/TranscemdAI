@@ -107,3 +107,13 @@ def image_caption():
         return bot.image_caption(url)
     except Exception as e:
         return make_response('Image Url Error', 400)
+
+
+@app.route('/image_qa', methods=['POST'])
+def image_qa():
+    try:
+        url = request.json['url']
+        text = request.json['text']
+        return bot.image_qa(url, text)
+    except Exception as e:
+        make_response('Invalid Url Error', 400)

@@ -13,8 +13,7 @@ import cv2
 from diffusers.utils import export_to_video
 import random
 from transformers import pipeline
-
-
+from transformers import BlipProcessor, BlipForQuestionAnswering
 
 
 class ImageBot:
@@ -45,6 +44,8 @@ class ImageBot:
                                                                 variant="fp16")
         self.video_diffuser.scheduler = DPMSolverMultistepScheduler.from_config(self.video_diffuser.scheduler.config)
         self.video_diffuser.enable_model_cpu_offload()
+        self.image_qa_processor = BlipProcessor.from_pretrained("Salesforce/blip-vqa-base")
+        self.image_qa_model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
         self.image_to_text = pipeline("image-to-text", model="nlpconnect/vit-gpt2-image-captioning")
         self.temp_location = './temp/'
         self.negative_prompt = None
@@ -158,6 +159,12 @@ class ImageBot:
 
     def image_caption(self, url):
         return self.image_to_text(url)
+
+    def image_qa(self, url, question):
+        raw_image = Image.open(requests.get(url, stream=True).raw).convert('RGB')
+        inputs = self.image_qa_processor(raw_image, question, return_tensors="pt")
+        out = self.image_qa_model.generate(**inputs)
+        return self.image_qa_processor.decode(out[0], skip_special_tokens=True)
 
     def give_n_prompts(self):
         self.negative_prompt = "split image, out of frame, amputee, mutated, mutation, deformed, severed, " \

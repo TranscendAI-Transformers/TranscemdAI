@@ -232,9 +232,26 @@ from transformers import pipeline
 # bot= TextBot()
 # bot.run_pipeline('https://www.youtube.com/watch?v=HSh6EgMwMOY&ab_channel=CNBC')
 
-from transformers import pipeline
+#from transformers import pipeline
+#
+# image_to_text = pipeline("image-to-text", model="nlpconnect/vit-gpt2-image-captioning")
+#
+# print(image_to_text("https://ankur3107.github.io/assets/images/image-captioning-example.png"))
 
-image_to_text = pipeline("image-to-text", model="nlpconnect/vit-gpt2-image-captioning")
+import requests
+from PIL import Image
+from transformers import BlipProcessor, BlipForQuestionAnswering
 
-print(image_to_text("https://ankur3107.github.io/assets/images/image-captioning-example.png"))
+processor = BlipProcessor.from_pretrained("Salesforce/blip-vqa-base")
+model = BlipForQuestionAnswering.from_pretrained("Salesforce/blip-vqa-base")
+
+img_url = 'https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg'
+raw_image = Image.open(requests.get(img_url, stream=True).raw).convert('RGB')
+
+question = "how many dogs are in the picture?"
+inputs = processor(raw_image, question, return_tensors="pt")
+
+out = model.generate(**inputs)
+print(processor.decode(out[0], skip_special_tokens=True))
+
 

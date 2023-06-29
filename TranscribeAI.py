@@ -62,3 +62,6 @@ class TranscendAI:
     def image_caption(self, url):
         return self.image_bot.image_caption(url)
 
+    def image_qa(self, url, question):
+        return self.image_bot.image_qa(url, question)
+
